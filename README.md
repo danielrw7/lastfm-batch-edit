@@ -1,6 +1,6 @@
 # lastfm-batch-edit
 
-Edit all scrobbles in a list on [last.fm](https://www.last.fm)
+Edit all scrobbles in a list on [last.fm](https://www.last.fm). **This tool works on top of the new edit scrobbles update which is currently limited to subscribers**
 
 ## Installation
 
