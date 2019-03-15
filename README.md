@@ -1,6 +1,6 @@
 # lastfm-batch-edit
 
-Edit all scrobbles on a page on [last.fm](https://www.last.fm)
+Edit all scrobbles in a list on [last.fm](https://www.last.fm)
 
 ## Installation
 
@@ -20,6 +20,5 @@ After installing Greasemonkey/Tampermonkey extension, click on
 3. Edit the scrobble to the attributes you want for all scrobbles on the page
 4. Click "Apply To All" ![Apply To All](screenshots/Apply_To_All.png)
 5. Check the attributes in the confirm box and click "Ok" if everything looks correct
-6. Wait until you get the "Complete" alert
-7. Check that everything ran correctly and repeat if necessary
-8. Enjoy your edited scrobbles :) ![Complete](screenshots/Complete.png)
+6. Wait until you get the "Batch edit completed!" alert. The script will go through each page in reverse order (e.g. 3, 2, 1)
+7. Enjoy your edited scrobbles :) ![Complete](screenshots/Complete.png)

@@ -12,9 +12,9 @@ window.eval(`
 async function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms))
 }
-const waitForPopupMaxTries = 100
+const waitMaxTries = 100
 async function waitForPopup(open) {
-    for (let tries = 0; tries < waitForPopupMaxTries; tries++) {
+    for (let tries = 0; tries < waitMaxTries; tries++) {
         await sleep(100)
         if (open === !!(jQuery('.modal-dialog').length)) {
             break
@@ -42,6 +42,36 @@ function scrobbleHasChange(form, newAttributes = {}) {
     }
     return false
 }
+function getNumPages() {
+    return parseInt(jQuery('.pagination-list > .pagination-page:nth(-1)').text().trim())
+}
+function getCurrentPage() {
+    return parseInt(jQuery('.pagination-list > [aria-current="page"]').text().trim())
+}
+async function setPage(n) {
+    const currentPage = getCurrentPage()
+    if (!currentPage || currentPage === n) {
+        return
+    }
+    console.log('setting page to', n)
+    jQuery(\`[href$="?page=\${n}"]:first\`).click()
+    for (let tries = 0; tries < waitMaxTries; tries++) {
+        await sleep(100)
+        if (jQuery('.loading-indicator-loading').length) {
+            break
+        }
+    }
+    for (let tries = 0; tries < waitMaxTries; tries++) {
+        await sleep(100)
+        if (!jQuery('.loading-indicator-loading').length) {
+            break
+        }
+    }
+
+    // The event listeners on the hidden forms are not initialized for an unknown amount of time after the page is done loading
+    await sleep(1000)
+    console.log('page is now', getCurrentPage() || 1)
+}
 let editScrobblesBatchInProgress = false
 async function editScrobblesBatch(newAttributes = {}) {
     if (editScrobblesBatchInProgress) {
@@ -50,16 +80,20 @@ async function editScrobblesBatch(newAttributes = {}) {
     if (!confirm(labelFromAttributes(newAttributes) + "\\n\\nContinue?")) {
         return
     }
-    const forms = jQuery('[action*="/library/edit"]').toArray().filter((form) => {
-        return scrobbleHasChange(form, newAttributes)
-    })
-    if (!forms.length) {
-        alert("All scrobbles match desired attributes")
-        return
-    }
     editScrobblesBatchInProgress = true
-    for (let form of forms) {
-        await editScrobble(form, newAttributes)
+    const lastPage = getNumPages() || 1
+    for (let page = lastPage; page >= 1; page--) {
+        await setPage(page)
+        const forms = jQuery('[action*="/library/edit"]').toArray().filter((form) => {
+            return scrobbleHasChange(form, newAttributes)
+        })
+        for (let form of forms) {
+            await editScrobble(form, newAttributes)
+        }
+    }
+    if (confirm('Batch edit completed!\\n\\nReload?')) {
+        window.location.reload()
+        return
     }
     editScrobblesBatchInProgress = false
 }
