@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name        lastfm-batch-edit
+// @version     0.1
+// @author      https://github.com/danielrw7
+// @description Edit all scrobbles on a page on last.fm
+// @include     https://*.last.fm/*
+// @include     https://last.fm/*
+// @grant       window.eval
+// ==/UserScript==
+
+window.eval(`
 async function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms))
 }
@@ -16,7 +27,7 @@ async function editScrobble(form, newAttributes = {}) {
     await waitForPopup(true)
     Object.entries(newAttributes).forEach(([key, value]) => {
         jQuery('#id_' + key).val(value)
-        $form.find(`[name = "${key}"]`).val(value)
+        $form.find(\`[name = "\${key}"]\`).val(value)
     })
     jQuery('.modal-body [type="submit"]').click()
     await waitForPopup(false)
@@ -25,7 +36,7 @@ function scrobbleHasChange(form, newAttributes = {}) {
     const $form = jQuery(form)
     for (let attribute of Object.entries(newAttributes)) {
         const [key, value] = attribute
-        if ($form.find(`[name = "${key}"]`).val() !== value) {
+        if ($form.find(\`[name = "\${key}"]\`).val() !== value) {
             return true
         }
     }
@@ -36,7 +47,7 @@ async function editScrobblesBatch(newAttributes = {}) {
     if (editScrobblesBatchInProgress) {
         alert("There is a batch edit already in progress, canceling")
     }
-    if (!confirm(labelFromAttributes(newAttributes) + "\n\nContinue?")) {
+    if (!confirm(labelFromAttributes(newAttributes) + "\\n\\nContinue?")) {
         return
     }
     const forms = jQuery('[action*="/library/edit"]').toArray().filter((form) => {
@@ -62,8 +73,8 @@ function getAttributesFromModal() {
 function labelFromAttributes(newAttributes) {
     const res = []
     return Object.entries(newAttributes).map(([key, value]) => {
-        return `${key.split('_').slice(0, -1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: ${value}`
-    }).join('\n')
+        return \`\${key.split('_').slice(0, -1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: \${value}\`
+    }).join('\\n')
 }
 function injectButton() {
     injectCSS()
@@ -87,7 +98,7 @@ function injectCSS() {
     if (injectedCSS) {
         return
     }
-    var css = `
+    var css = \`
         .apply-to-all {
             color: white;
             background-color: rgb(34, 34, 34);
@@ -96,7 +107,7 @@ function injectCSS() {
             color: white;
             background-color: rgb(20, 20, 20) !important;
         }
-    `;
+    \`;
     var style = document.createElement('style');
 
     if (style.styleSheet) {
@@ -125,3 +136,4 @@ if (window.jQuery) {
 } else {
     window.onload = init
 }
+`)

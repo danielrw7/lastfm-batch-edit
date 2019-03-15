@@ -1,0 +1,20 @@
+#!/bin/sh
+
+script=$(cat editScrobblesBatch.js)
+script="${script//\`/\\\`}"
+script="${script//$\{/\\$\{}"
+script="${script//\\n/\\\\n}"
+
+echo "// ==UserScript==
+// @name        lastfm-batch-edit
+// @version     0.1
+// @author      https://github.com/danielrw7
+// @description Edit all scrobbles on a page on last.fm
+// @include     https://*.last.fm/*
+// @include     https://last.fm/*
+// @grant       window.eval
+// ==/UserScript==
+
+window.eval(\`
+$script
+\`)" > editScrobblesBatch.user.js
