@@ -36,7 +36,7 @@ function scrobbleHasChange(form, newAttributes = {}) {
     const $form = jQuery(form)
     for (let attribute of Object.entries(newAttributes)) {
         const [key, value] = attribute
-        if ($form.find(\`[name = "\${key}"]\`).val() !== value) {
+        if ($form.find(\`[name = "\${key}"]\`).val().toLowerCase() !== value.toLowerCase()) {
             return true
         }
     }
@@ -53,7 +53,6 @@ async function setPage(n) {
     if (!currentPage || currentPage === n) {
         return
     }
-    console.log('setting page to', n)
     jQuery(\`[href$="?page=\${n}"]:first\`).click()
     for (let tries = 0; tries < waitMaxTries; tries++) {
         await sleep(100)
@@ -70,7 +69,6 @@ async function setPage(n) {
 
     // The event listeners on the hidden forms are not initialized for an unknown amount of time after the page is done loading
     await sleep(1000)
-    console.log('page is now', getCurrentPage() || 1)
 }
 let editScrobblesBatchInProgress = false
 async function editScrobblesBatch(newAttributes = {}) {

@@ -25,7 +25,7 @@ function scrobbleHasChange(form, newAttributes = {}) {
     const $form = jQuery(form)
     for (let attribute of Object.entries(newAttributes)) {
         const [key, value] = attribute
-        if ($form.find(`[name = "${key}"]`).val() !== value) {
+        if ($form.find(`[name = "${key}"]`).val().toLowerCase() !== value.toLowerCase()) {
             return true
         }
     }
